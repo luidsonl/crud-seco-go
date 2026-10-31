@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"todo-list/internal/database/migration"
 
 	_ "modernc.org/sqlite"
@@ -15,7 +16,19 @@ func main() {
 		log.Fatal("Usage: migrate [up|down|status]")
 	}
 
-	db, err := sql.Open("sqlite", "data/app.db")
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbDir := filepath.Join(wd, "data")
+	dbPath := filepath.Join(dbDir, "app.db")
+
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		log.Fatal(err)
+	}
+
+	db, err := sql.Open("sqlite", dbPath)
 
 	if err != nil {
 		log.Fatal(err)
